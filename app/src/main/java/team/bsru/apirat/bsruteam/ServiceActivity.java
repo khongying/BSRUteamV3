@@ -6,9 +6,11 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -29,6 +31,7 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
     private String[] loginString;
     private LocationManager locationManager;
     private Criteria criteria;
+    private boolean aBoolean = true; // for stop Loop
 
 
     @Override
@@ -58,11 +61,89 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // My Loop
+        myLoop();
+
+
     } //Main Method
+
+    private void myLoop() {
+
+        // Do ing
+        afterResume();
+
+        updateLatLng();
+
+        // Delay
+        if (aBoolean) {
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    myLoop();
+                }
+            },1000);
+
+        } // if
+
+
+
+    } //myLoop
+
+    private void updateLatLng() {
+
+        try {
+
+            EditLatLng editLatLng = new EditLatLng(loginString[0],ServiceActivity.this);
+            editLatLng.execute(Double.toString(userLatADouble),
+                    Double.toString(userLngADouble));
+            boolean b = Boolean.parseBoolean(editLatLng.get());
+            Log.d("17febV2", "Result ==>" + b);
+
+
+
+        } catch (Exception e) {
+            Log.d("17febV2", "e update ==>" + e.toString());
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        afterResume();
+
+
+    }
+
+    private void afterResume() {
+
+        Location networkLocation = myFindLocation(LocationManager.NETWORK_PROVIDER);
+        if (networkLocation != null) {
+            userLatADouble = networkLocation.getLatitude();
+            userLngADouble = networkLocation.getLongitude();
+        }
+
+        Location gpsLocation = myFindLocation(LocationManager.GPS_PROVIDER);
+        if (gpsLocation != null) {
+            userLatADouble = gpsLocation.getLatitude();
+            userLngADouble = gpsLocation.getLongitude();
+        }
+
+        Log.d("17febV1", "Lat ==>" + userLatADouble);
+        Log.d("17febV1", "Lng ==>" + userLngADouble);
+
+    } //after
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        aBoolean = false;
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
