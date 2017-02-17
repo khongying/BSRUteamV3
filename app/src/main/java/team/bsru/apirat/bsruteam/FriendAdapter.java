@@ -59,12 +59,11 @@ public class FriendAdapter extends BaseAdapter{
         imageView = (ImageView) view.findViewById(R.id.imageView4);
 
         //Show View
-        Log.d("17febV4", "name(" + position + ") ==>" + nameString[position]);
-        Log.d("17febV4", "image(" + position + ") ==>" + iconString[position]);
-
         textView.setText(nameString[position]);
         Picasso.with(context).load(iconString[position]).into(imageView);
 
+        Log.d("17febV4", "name(" + position + ") ==>" + nameString[position]);
+        Log.d("17febV4", "image(" + position + ") ==>" + iconString[position]);
 
         return view;
     }
