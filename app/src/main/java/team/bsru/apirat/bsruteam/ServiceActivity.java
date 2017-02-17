@@ -18,8 +18,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ServiceActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -75,6 +79,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
 
         updateLatLng();
 
+        createMarket();
+
         // Delay
         if (aBoolean) {
 
@@ -92,6 +98,41 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
 
     } //myLoop
 
+    private void createMarket() {
+        try{
+
+            mMap.clear();
+
+            String urlPHP = "http://swiftcodingthai.com/bsru/get_user_master.php";
+            int[] avataInts = new int[]{R.drawable.bird48, R.drawable.doremon48,
+            R.drawable.kon48, R.drawable.nobita48, R.drawable.rat48};
+
+            GetUser getUser = new GetUser(ServiceActivity.this);
+            getUser.execute(urlPHP);
+            String strJSON = getUser.get();
+
+            JSONArray jsonArray = new JSONArray(strJSON);
+            for (int i=0;i<jsonArray.length();i++) {
+
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                LatLng LatLng = new LatLng(Double.parseDouble(jsonObject.getString("Lat")),
+                        Double.parseDouble(jsonObject.getString("Lng")));
+                mMap.addMarker(new MarkerOptions()
+                        .position(LatLng)
+                .icon(BitmapDescriptorFactory
+                        .fromResource(avataInts[Integer.parseInt(jsonObject.getString("Avata"))]))
+                .title(jsonObject.getString("Name")));
+
+            } //for
+
+            getUser.cancel(true);
+
+        }catch (Exception e){
+            Log.d("17febV3", "e createMarker ==>" + e.toString());
+
+        }
+    }
+
     private void updateLatLng() {
 
         try {
@@ -101,6 +142,8 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
                     Double.toString(userLngADouble));
             boolean b = Boolean.parseBoolean(editLatLng.get());
             Log.d("17febV2", "Result ==>" + b);
+
+            editLatLng.cancel(true);
 
 
 
