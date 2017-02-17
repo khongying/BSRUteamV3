@@ -1,6 +1,7 @@
 package team.bsru.apirat.bsruteam;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -11,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -70,6 +72,22 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
         myLoop();
 
 
+        //Button
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                aBoolean = false;
+                Intent intent = new Intent(ServiceActivity.this, ListFriend.class);
+                intent.putExtra("Login", loginString);
+                startActivity(intent);
+                finish();
+
+
+            }
+        });
+
+
     } //Main Method
 
     private void myLoop() {
@@ -115,8 +133,10 @@ public class ServiceActivity extends FragmentActivity implements OnMapReadyCallb
             for (int i=0;i<jsonArray.length();i++) {
 
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                LatLng LatLng = new LatLng(Double.parseDouble(jsonObject.getString("Lat")),
-                        Double.parseDouble(jsonObject.getString("Lng")));
+                LatLng LatLng = new LatLng(
+                        Double.parseDouble(jsonObject.getString("Lat")),
+                        Double.parseDouble(jsonObject.getString("Lng"))
+                );
                 mMap.addMarker(new MarkerOptions()
                         .position(LatLng)
                 .icon(BitmapDescriptorFactory
